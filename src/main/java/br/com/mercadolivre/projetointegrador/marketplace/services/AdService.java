@@ -7,16 +7,21 @@ import br.com.mercadolivre.projetointegrador.marketplace.model.Ad;
 import br.com.mercadolivre.projetointegrador.marketplace.model.AdBatch;
 import br.com.mercadolivre.projetointegrador.marketplace.repository.AdBatchesRepository;
 import br.com.mercadolivre.projetointegrador.marketplace.repository.AdRepository;
+import br.com.mercadolivre.projetointegrador.metrics.enums.EntityEnum;
+import br.com.mercadolivre.projetointegrador.metrics.services.MetricsService;
 import br.com.mercadolivre.projetointegrador.warehouse.enums.CategoryEnum;
 import br.com.mercadolivre.projetointegrador.warehouse.exception.db.NotFoundException;
 import br.com.mercadolivre.projetointegrador.warehouse.model.Batch;
 import br.com.mercadolivre.projetointegrador.warehouse.repository.BatchRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -27,12 +32,13 @@ public class AdService {
   AdRepository adRepository;
   BatchRepository batchRepository;
   AdBatchesRepository adBatchesRepository;
+//  MetricsService metricsService;
 
   @Transactional(
       rollbackFor = Exception.class,
       propagation = Propagation.REQUIRED,
       isolation = Isolation.SERIALIZABLE)
-  public Ad createAd(Long sellerId, CreateOrUpdateAdDTO createAdDTO) {
+  public Ad createAd(Long sellerId, CreateOrUpdateAdDTO createAdDTO) throws URISyntaxException, JsonProcessingException {
     Ad ad = createAdDTO.DTOtoModel();
     ad.setSellerId(sellerId);
 
@@ -43,7 +49,9 @@ public class AdService {
             .reduce(0, Integer::sum);
 
     ad.setQuantity(quantity);
+    ad.setCreatedAt(LocalDate.now());
     adRepository.save(ad);
+//    metricsService.createMetric(EntityEnum.ad, ad);
 
     for (Integer id : batchesId) {
       AdBatch adBatch = new AdBatch();
@@ -101,5 +109,12 @@ public class AdService {
       throw new UnauthorizedException("Não é permitido excluir o anúncio de outro usuário.");
     }
     adRepository.delete(ad);
+  }
+
+
+  public List<Ad> listAllCreatedGreaterThanInDays(long days) {
+    LocalDate date = LocalDate.now().minusDays(days);
+
+    return adRepository.findAllByCreatedAtGreaterThanOrderByCreatedAtAsc(date);
   }
 }

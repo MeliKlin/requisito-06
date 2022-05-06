@@ -2,10 +2,12 @@ package br.com.mercadolivre.projetointegrador.marketplace.repository;
 
 import br.com.mercadolivre.projetointegrador.marketplace.model.Ad;
 import br.com.mercadolivre.projetointegrador.warehouse.enums.CategoryEnum;
+import br.com.mercadolivre.projetointegrador.warehouse.model.Batch;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -18,4 +20,6 @@ public interface AdRepository extends JpaRepository<Ad, Long> {
   List<Ad> findAllByCategory(CategoryEnum category);
 
   List<Ad> findAllByCategoryAndNameLike(CategoryEnum category, String name);
+
+  List<Ad> findAllByCreatedAtGreaterThanOrderByCreatedAtAsc(LocalDate date);
 }

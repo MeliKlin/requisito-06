@@ -4,10 +4,13 @@ import br.com.mercadolivre.projetointegrador.marketplace.dtos.CreateOrUpdateAdDT
 import br.com.mercadolivre.projetointegrador.marketplace.exceptions.UnauthorizedException;
 import br.com.mercadolivre.projetointegrador.marketplace.model.Ad;
 import br.com.mercadolivre.projetointegrador.marketplace.services.AdService;
+import br.com.mercadolivre.projetointegrador.metrics.enums.EntityEnum;
+import br.com.mercadolivre.projetointegrador.metrics.services.MetricsService;
 import br.com.mercadolivre.projetointegrador.security.model.AppUser;
 import br.com.mercadolivre.projetointegrador.security.repository.AppUserRepository;
 import br.com.mercadolivre.projetointegrador.warehouse.docs.config.SecuredMarketplaceRestController;
 import br.com.mercadolivre.projetointegrador.warehouse.enums.CategoryEnum;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -20,6 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
@@ -29,6 +33,7 @@ import java.util.List;
 public class AdController implements SecuredMarketplaceRestController {
   AdService adService;
   AppUserRepository tokenService;
+  MetricsService metricsService;
 
   @Operation(summary = "CRIA UM ANÚNCIO", description = "Cria um anúncio relacionado a um produto")
   @ApiResponses(
@@ -42,9 +47,10 @@ public class AdController implements SecuredMarketplaceRestController {
   public ResponseEntity<Void> createAd(
       @Valid @RequestBody CreateOrUpdateAdDTO createOrUpdateAdDTO,
       UriComponentsBuilder uriBuilder,
-      Authentication authentication) {
+      Authentication authentication) throws URISyntaxException, JsonProcessingException {
     AppUser requestUser = (AppUser) authentication.getPrincipal();
     Ad ad = adService.createAd(requestUser.getId(), createOrUpdateAdDTO);
+    metricsService.createMetric(EntityEnum.ad, ad);
     URI uri = uriBuilder.path("/api/v1/ad/{id}").buildAndExpand(ad.getId()).toUri();
 
     return ResponseEntity.created(uri).build();

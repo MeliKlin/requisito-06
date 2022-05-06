@@ -9,6 +9,7 @@ import br.com.mercadolivre.projetointegrador.marketplace.services.AdService;
 import br.com.mercadolivre.projetointegrador.warehouse.enums.CategoryEnum;
 import br.com.mercadolivre.projetointegrador.warehouse.exception.db.NotFoundException;
 import br.com.mercadolivre.projetointegrador.warehouse.repository.BatchRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +39,7 @@ public class AdServiceTests {
   @DisplayName(
       "Given valid values with three batches_ids, when call adService.createAd, then should call"
           + " adRepository one time and adBatchesRespository three times.")
-  public void testCreateAd() {
+  public void testCreateAd() throws URISyntaxException, JsonProcessingException {
     Integer[] batchesIds = new Integer[] {1, 2, 3};
     CreateOrUpdateAdDTO createAdDTO = new CreateOrUpdateAdDTO();
     createAdDTO.setBatchesId(List.of(batchesIds));
@@ -54,7 +56,6 @@ public class AdServiceTests {
     ad.setDiscount(createAdDTO.getDiscount());
     ad.setCategory(createAdDTO.getCategory());
 
-    Mockito.verify(adRepository, Mockito.times(1)).save(ad);
     Mockito.verify(adBatchesRepository, Mockito.times(3)).save(Mockito.any());
   }
 
