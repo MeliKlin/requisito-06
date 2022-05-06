@@ -1,5 +1,6 @@
 package br.com.mercadolivre.projetointegrador.unit.service;
 
+import br.com.mercadolivre.projetointegrador.metrics.services.MetricsService;
 import br.com.mercadolivre.projetointegrador.warehouse.enums.SortTypeEnum;
 import br.com.mercadolivre.projetointegrador.warehouse.exception.db.NotFoundException;
 import br.com.mercadolivre.projetointegrador.warehouse.exception.db.SectionNotFoundException;
@@ -12,6 +13,7 @@ import br.com.mercadolivre.projetointegrador.warehouse.repository.SectionReposit
 import br.com.mercadolivre.projetointegrador.warehouse.service.ProductService;
 import br.com.mercadolivre.projetointegrador.warehouse.service.WarehouseService;
 import br.com.mercadolivre.projetointegrador.warehouse.service.validators.WarehouseValidatorExecutor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,19 +36,27 @@ public class WarehouseTest {
 
   @Mock private WarehouseValidatorExecutor warehouseValidatorExecutor;
 
+  @Mock private MetricsService metricsService;
+
   @Mock private ProductService productService;
 
   @InjectMocks private WarehouseService warehouseService;
 
   @Test
-  public void TestIfSaveBatchInSection() throws NotFoundException {
+  public void TestIfSaveBatchInSection() throws NotFoundException, URISyntaxException, JsonProcessingException {
 
     List<Batch> expected = WarehouseTestUtils.getBatch();
 
     Mockito.doNothing().when(batchService).createBatch(Mockito.any());
 
     List<Batch> result = warehouseService.saveBatchInSection(WarehouseTestUtils.getInboundOrder());
-    assertEquals(expected, result);
+    for (int i = 0; i < expected.size(); i++) {
+      assertEquals(expected.get(i).getSection(), result.get(i).getSection());
+      assertEquals(expected.get(i).getBatchNumber(), result.get(i).getBatchNumber());
+      assertEquals(expected.get(i).getDueDate(), result.get(i).getDueDate());
+      assertEquals(expected.get(i).getOrder_number(), result.get(i).getOrder_number());
+      assertEquals(expected.get(i).getQuantity(), result.get(i).getQuantity());
+    }
   }
 
   @Test

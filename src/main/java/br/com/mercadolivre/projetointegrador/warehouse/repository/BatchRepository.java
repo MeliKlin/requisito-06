@@ -26,4 +26,6 @@ public interface BatchRepository extends JpaRepository<Batch, Long> {
 
   List<Batch> findBatchByProductAndSectionAndDueDateGreaterThan(
       Product product, Section section, Sort sort, LocalDate date);
+
+  List<Batch> findAllByMetricCreatedAtGreaterThanOrderByMetricCreatedAtAsc(LocalDate date);
 }

@@ -11,6 +11,7 @@ import br.com.mercadolivre.projetointegrador.warehouse.mapper.InboundOrderMapper
 import br.com.mercadolivre.projetointegrador.security.model.AppUser;
 import br.com.mercadolivre.projetointegrador.warehouse.model.InboundOrder;
 import br.com.mercadolivre.projetointegrador.warehouse.service.WarehouseService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
@@ -77,12 +79,13 @@ public class InboundOrderControllerWarehouse implements SecuredWarehouseRestCont
   @PostMapping
   public ResponseEntity<List<BatchResponseDTO>> addInboundOrder(
       @RequestBody @Valid InboundOrderDTO dto, Authentication authentication)
-      throws NotFoundException {
+          throws NotFoundException, URISyntaxException, JsonProcessingException {
     AppUser requestUser = (AppUser) authentication.getPrincipal();
     InboundOrder inboundOrderToSave = inboundOrderMapper.toModel(dto);
     inboundOrderToSave.setManagerId(requestUser.getId());
 
     List<Batch> savedBatches = warehouseService.saveBatchInSection(inboundOrderToSave);
+
 
     return assembler.toCreatedResponse(savedBatches);
   }

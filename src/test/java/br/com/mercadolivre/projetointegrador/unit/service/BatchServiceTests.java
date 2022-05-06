@@ -11,6 +11,7 @@ import br.com.mercadolivre.projetointegrador.warehouse.repository.BatchRepositor
 import br.com.mercadolivre.projetointegrador.warehouse.repository.ProductRepository;
 import br.com.mercadolivre.projetointegrador.warehouse.service.BatchService;
 import br.com.mercadolivre.projetointegrador.warehouse.service.ProductService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +46,7 @@ public class BatchServiceTests {
   @DisplayName(
       "Given a valid batch with existing product, when call createBatch, then batchRepository.save"
           + " should be called once;")
-  public void createBatchSuccessfully() throws NotFoundException, ProductAlreadyExists {
+  public void createBatchSuccessfully() throws NotFoundException, ProductAlreadyExists, URISyntaxException, JsonProcessingException {
     Product product = new Product();
     product.setId(1L);
     Mockito.when(productRepository.findById(Mockito.any())).thenReturn(Optional.of(product));

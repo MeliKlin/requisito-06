@@ -1,5 +1,7 @@
 package br.com.mercadolivre.projetointegrador.warehouse.service;
 
+import br.com.mercadolivre.projetointegrador.metrics.enums.EntityEnum;
+import br.com.mercadolivre.projetointegrador.metrics.services.MetricsService;
 import br.com.mercadolivre.projetointegrador.warehouse.enums.SortTypeEnum;
 import br.com.mercadolivre.projetointegrador.warehouse.exception.db.NotFoundException;
 import br.com.mercadolivre.projetointegrador.warehouse.exception.db.SectionNotFoundException;
@@ -10,10 +12,13 @@ import br.com.mercadolivre.projetointegrador.warehouse.repository.SectionReposit
 import br.com.mercadolivre.projetointegrador.warehouse.repository.WarehouseRepository;
 import br.com.mercadolivre.projetointegrador.warehouse.service.validators.BatchDuplicatedValidator;
 import br.com.mercadolivre.projetointegrador.warehouse.service.validators.WarehouseValidatorExecutor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +32,7 @@ public class WarehouseService {
   private final WarehouseValidatorExecutor warehouseValidatorExecutor;
   private final SectionRepository sectionRepository;
   private final ProductService productService;
+  private final MetricsService metricsService;
 
   public Warehouse createWarehouse(Warehouse warehouse) {
     return warehouseRepository.save(warehouse);
@@ -38,7 +44,7 @@ public class WarehouseService {
         .orElseThrow(() -> new WarehouseNotFoundException("Warehouse não encontrada."));
   }
 
-  public List<Batch> saveBatchInSection(InboundOrder inboundOrder) throws NotFoundException {
+  public List<Batch> saveBatchInSection(InboundOrder inboundOrder) throws NotFoundException, URISyntaxException, JsonProcessingException {
 
     warehouseValidatorExecutor.executeValidators(
         inboundOrder, List.of(new BatchDuplicatedValidator(inboundOrder, batchRepository)));
@@ -47,7 +53,9 @@ public class WarehouseService {
 
     for (Batch batch : inboundOrder.getBatches()) {
       addedBatches.add(batch);
+      batch.setMetricCreatedAt(LocalDate.now());
       batchService.createBatch(batch);
+      metricsService.createMetric(EntityEnum.batch, batch);
     }
 
     return addedBatches;

@@ -35,7 +35,7 @@ public class WarehouseTestUtils {
             4,
             null,
             null,
-            null);
+            null, null);
 
     Batch batch2 =
         new Batch(
@@ -49,7 +49,7 @@ public class WarehouseTestUtils {
             5,
             null,
             null,
-            null);
+            null, null);
 
     batches.add(batch1);
     batches.add(batch2);
@@ -73,7 +73,7 @@ public class WarehouseTestUtils {
             4,
             null,
             null,
-            null);
+            null, null);
 
     return batch1;
   }
@@ -94,7 +94,7 @@ public class WarehouseTestUtils {
             5,
             null,
             null,
-            null);
+            null, null);
 
     return batch2;
   }

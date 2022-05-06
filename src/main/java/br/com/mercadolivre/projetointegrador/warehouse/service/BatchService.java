@@ -5,11 +5,13 @@ import br.com.mercadolivre.projetointegrador.warehouse.model.Batch;
 import br.com.mercadolivre.projetointegrador.warehouse.model.Product;
 import br.com.mercadolivre.projetointegrador.warehouse.model.Section;
 import br.com.mercadolivre.projetointegrador.warehouse.repository.BatchRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
 
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -25,7 +27,7 @@ public class BatchService {
   @Value("${ad.minimumWeeks}")
   private Integer minimumWeeksToAnnounce;
 
-  public void createBatch(Batch batch) throws NotFoundException {
+  public void createBatch(Batch batch) throws NotFoundException, URISyntaxException, JsonProcessingException {
     productService.findById(batch.getProduct().getId());
 
     batchRepository.save(batch);
@@ -118,5 +120,11 @@ public class BatchService {
     LocalDate date = LocalDate.now().plusWeeks(minimumWeeksToAnnounce);
 
     return batchRepository.findAllBySellerIdAndDueDateGreaterThan(sellerId, date);
+  }
+
+  public List<Batch> listAllCreatedGreaterThanInDays(long days) {
+    LocalDate date = LocalDate.now().minusDays(days);
+
+    return batchRepository.findAllByMetricCreatedAtGreaterThanOrderByMetricCreatedAtAsc(date);
   }
 }

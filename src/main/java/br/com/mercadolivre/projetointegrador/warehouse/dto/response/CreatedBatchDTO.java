@@ -26,7 +26,7 @@ public class CreatedBatchDTO {
   private Integer quantity;
   private LocalDate manufacturing_datetime;
   private LocalDate due_date;
-  private LocalDate created_at;
+  private LocalDate createdAt;
 
   private List<Map<String, String>> links;
 }
