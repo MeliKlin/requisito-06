@@ -58,4 +58,6 @@ public class Batch {
   @Column private LocalDate dueDate;
 
   @Column @CreatedDate private LocalDate created_at;
+
+  @Column private LocalDate metricCreatedAt;
 }
