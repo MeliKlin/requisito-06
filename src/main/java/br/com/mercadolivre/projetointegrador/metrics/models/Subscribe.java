@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
 
@@ -13,9 +15,10 @@ import javax.validation.constraints.NotEmpty;
 public class Subscribe {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private EntityEnum entity;
+    private String entity;
 
     @NotEmpty(message = "Favor, informar o endpoint que deseja se inscrever")
     private String url;
