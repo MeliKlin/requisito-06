@@ -71,7 +71,7 @@ curl -X POST http://localhost:8080/api/v1/warehouse/inboundorder -H "Authorizati
         "product_id": 1,
         "seller_id": 1,
         "price": 1.90,
-        "batch_number": 12,
+        "batchNumber": 12,
         "quantity": 1000,
         "manufacturing_datetime": "2022-01-01",
         "due_date": "2022-06-01"
