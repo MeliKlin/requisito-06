@@ -15,3 +15,13 @@ services:
     image: redis:3.2.5-alpine
     ports:
       - 6379:6379
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=master:redis
+    ports:
+      - "8081:8081"
